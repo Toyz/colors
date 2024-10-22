@@ -30,7 +30,7 @@
 
       <div class="flex space-x-4 relative items-center align-middle">
         <div class="relative group">
-          <button v-if="colors.length > 0" @click="resetColorView" class="bg-transparent">
+          <button v-if="colors.length > 0" @click="isResetModelOpen = true" class="bg-transparent">
             <i class="fas fa-arrows-rotate text-red-600 text-2xl cursor-pointer"></i>
           </button>
           <span
@@ -74,7 +74,30 @@
             class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow focus:outline-none">
             Copy
           </button>
-          <button @click="closeShareModal"
+          <button @click="isShareModalOpen = false"
+            class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg shadow focus:outline-none">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Share Modal -->
+    <div v-if="isResetModelOpen" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+      <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-md">
+        <h2 class="text-xl font-bold mb-4 text-gray-800 dark:text-gray-200">Reset Colors</h2>
+
+        <!-- Shareable URL Input Field -->
+        <div class="relative mb-4 text-gray-800 dark:text-gray-200">
+          Are you sure you want to reset the colors?
+        </div>
+
+        <div class="mt-4 flex justify-end space-x-2">
+          <button @click="resetColors"
+            class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow focus:outline-none">
+            Reset
+          </button>
+          <button @click="isResetModelOpen = false"
             class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg shadow focus:outline-none">
             Close
           </button>
@@ -105,6 +128,7 @@ import ColorInput from './ColorInput.vue';
 // Color list, starts with one empty input
 const colors = ref<string[]>(['']);
 const isShareModalOpen = ref(false); // Modal visibility
+const isResetModelOpen = ref(false); // Modal visibility
 const shareableUrl = ref('');
 
 // Function to add a new color input
@@ -148,11 +172,6 @@ const openShareModal = () => {
   const base64Colors = btoa(colorString);
   shareableUrl.value = `${window.location.origin}${window.location.pathname}#${base64Colors}`;
   isShareModalOpen.value = true;
-};
-
-// Close Share Modal
-const closeShareModal = () => {
-  isShareModalOpen.value = false;
 };
 
 // Copy shareable URL to clipboard
@@ -205,12 +224,18 @@ const handleKeyDown = (event: KeyboardEvent) => {
     removeLastColorInput();
   } // else if escape key, close modal
   else if (event.key === 'Escape') {
-    closeShareModal();
+    isShareModalOpen.value = false;
+    isResetModelOpen.value = false;
   } else if (event.altKey && event.key === 's') {
     openShareModal();
   } else if (event.altKey && event.key === 'r') {
-    resetColorView();
+    isResetModelOpen.value = true;
   }
+};
+
+const resetColors = () => {
+  resetColorView();
+  isResetModelOpen.value = false;
 };
 
 const resetColorView = () => {
