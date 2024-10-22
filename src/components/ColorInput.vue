@@ -52,11 +52,6 @@ watch(colorValue, (newColor) => {
   colorPickerValue.value = newColor; // Sync with the picker
 });
 
-// Toggle the color picker popover
-const togglePicker = () => {
-  showPicker.value = !showPicker.value;
-};
-
 // Close color picker when clicked outside
 const closePickerOnOutsideClick = (event: MouseEvent) => {
   const colorPickerElement = document.querySelector('.relative');

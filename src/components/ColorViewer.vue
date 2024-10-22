@@ -53,7 +53,7 @@
 
         <!-- Shareable URL Input Field -->
         <div class="relative mb-4">
-          <input ref="shareableUrlInput" :value="shareableUrl" readonly @click="selectUrl"
+          <input :value="shareableUrl" readonly
             class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-800 dark:text-gray-200 bg-gray-100 dark:bg-gray-700 shadow-sm focus:outline-none cursor-pointer" />
         </div>
 
@@ -173,7 +173,7 @@ const handlePaste = (event: ClipboardEvent) => {
 };
 
 const selectUrl = () => {
-  const inputElement = ref('shareableUrlInput').value;
+  const inputElement = ref('shareableUrlInput').value as any;
   if (inputElement) {
     inputElement.select();
   }
