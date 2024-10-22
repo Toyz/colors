@@ -41,7 +41,7 @@
     </div>
 
     <!-- Color Inputs -->
-    <div class="space-y-2 w-full max-w-lg" @paste="handlePaste">
+    <div class="space-y-2 w-full max-w-lg">
       <ColorInput v-for="(color, index) in colors" :key="index" :color="color"
         @update:color="updateColor(index, $event)" @remove="removeColor(index)" />
     </div>
@@ -218,10 +218,13 @@ onMounted(() => {
   }
 
   window.addEventListener('keydown', handleKeyDown);
+  // on paste, handle the event
+  window.addEventListener('paste', handlePaste);
 });
 
 onBeforeUnmount(() => {
   window.removeEventListener('keydown', handleKeyDown);
+  window.removeEventListener('paste', handlePaste);
 });
 </script>
 

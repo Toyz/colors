@@ -2,7 +2,7 @@
   <div class="flex items-center space-x-4 p-3 bg-gray-100 dark:bg-gray-900 rounded-lg shadow-lg w-full relative">
     <!-- Color Preview Box that toggles the popover -->
     <div class="relative">
-      <div class="w-12 h-12 rounded border border-gray-300 dark:border-gray-600"
+      <div class="w-12 h-12 rounded-lg border border-gray-300 dark:border-gray-600"
         :style="{ backgroundColor: colorValue }"></div>
     </div>
 
@@ -12,7 +12,7 @@
       placeholder="Enter HEX (e.g., #FF5733)" />
 
     <!-- Remove Button -->
-    <button @click="onRemove" class="text-red-500 hover:text-red-700">
+    <button @click="onRemove" class="text-red-500 hover:text-red-700 p-3">
       <i class="fas fa-trash text-xl"></i> <!-- Font Awesome Icon -->
     </button>
   </div>
