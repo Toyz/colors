@@ -172,13 +172,6 @@ const handlePaste = (event: ClipboardEvent) => {
   }
 };
 
-const selectUrl = () => {
-  const inputElement = ref('shareableUrlInput').value as any;
-  if (inputElement) {
-    inputElement.select();
-  }
-};
-
 // Fill first available empty input or add new input
 const fillFirstAvailableOrAdd = (colorValue: string) => {
   let availableSlotIndex = colors.value.findIndex(color => color === '');
