@@ -6,7 +6,7 @@
     <!-- Action Buttons -->
     <div class="flex justify-between items-center mb-2 w-full max-w-lg">
       <!-- Left - Add and Remove Icons -->
-      <div class="flex space-x-4 relative">
+      <div class="flex space-x-4 relative items-center align-middle">
         <div class="relative group">
           <button @click="addNewColorInput" class="bg-transparent">
             <i class="fas fa-plus text-blue-600 text-2xl cursor-pointer"></i>
@@ -28,15 +28,27 @@
         </div>
       </div>
 
-      <!-- Right - Share Icon -->
-      <div class="relative group">
-        <button @click="openShareModal" class="bg-transparent">
-          <i class="fas fa-share-alt text-green-600 text-2xl cursor-pointer"></i>
-        </button>
-        <span
-          class="absolute right-full mr-2 px-2 py-1 bg-gray-900 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity z-10 whitespace-nowrap pointer-events-none">
-          Share Colors
-        </span>
+      <div class="flex space-x-4 relative items-center align-middle">
+        <div class="relative group">
+          <button v-if="colors.length > 0" @click="resetColorView" class="bg-transparent">
+            <i class="fas fa-arrows-rotate text-red-600 text-2xl cursor-pointer"></i>
+          </button>
+          <span
+            class="absolute right-full mr-2 px-2 py-1 bg-gray-900 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity z-10 whitespace-nowrap pointer-events-none">
+            Reset Colors
+          </span>
+        </div>
+
+        <!-- Right - Share Icon -->
+        <div class="relative group">
+          <button @click="openShareModal" class="bg-transparent">
+            <i class="fas fa-share-alt text-green-600 text-2xl cursor-pointer"></i>
+          </button>
+          <span
+            class="absolute right-full mr-2 px-2 py-1 bg-gray-900 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity z-10 whitespace-nowrap pointer-events-none">
+            Share Colors
+          </span>
+        </div>
       </div>
     </div>
 
@@ -197,8 +209,19 @@ const handleKeyDown = (event: KeyboardEvent) => {
   } else if (event.altKey && event.key === 's') {
     openShareModal();
   } else if (event.altKey && event.key === 'r') {
-    colors.value = [''];
+    resetColorView();
   }
+};
+
+const resetColorView = () => {
+  colors.value = [''];
+
+  // if we have a hash, remove it
+  if (window.location.hash) {
+    window.history.pushState('', document.title, window.location.pathname + window.location.search);
+  }
+
+  shareableUrl.value = '';
 };
 
 // Add event listeners on mount and remove them before unmount
