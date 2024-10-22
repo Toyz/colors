@@ -8,7 +8,7 @@
 
     <!-- Color HEX Display -->
     <input type="text" v-model="colorValue"
-      class="p-2 text-lg border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 shadow-sm w-full"
+      class="p-2 text-lg border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 shadow-sm w-full uppercase placeholder:normal-case"
       placeholder="Enter HEX (e.g., #FF5733)" />
 
     <!-- Remove Button -->
