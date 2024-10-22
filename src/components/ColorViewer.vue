@@ -194,6 +194,10 @@ const handleKeyDown = (event: KeyboardEvent) => {
   } // else if escape key, close modal
   else if (event.key === 'Escape') {
     closeShareModal();
+  } else if (event.altKey && event.key === 's') {
+    openShareModal();
+  } else if (event.altKey && event.key === 'r') {
+    colors.value = [''];
   }
 };
 
