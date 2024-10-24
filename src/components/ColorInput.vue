@@ -1,22 +1,26 @@
 <template>
-  <div class="flex items-center space-x-4 p-3 bg-gray-100 dark:bg-gray-900 rounded-lg shadow-lg w-full relative">
-    <!-- Color Preview Box that toggles the popover -->
-    <div class="relative">
-      <div class="w-12 h-12 rounded-lg border border-gray-300 dark:border-gray-600"
-        :style="{ backgroundColor: colorValue }"></div>
+  <div class="flex items-center bg-gray-100 dark:bg-gray-900 rounded-lg shadow-lg w-full relative">
+    <!-- Color Preview Box as Prefix -->
+    <div class="flex items-center">
+      <div class="w-16 h-16 rounded-l-lg" :style="{ backgroundColor: colorValue }"></div>
     </div>
 
-    <!-- Color HEX Display -->
-    <input type="text" v-model="colorValue"
-      class="p-2 text-lg border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 shadow-sm w-full uppercase placeholder:normal-case"
-      placeholder="Enter HEX (e.g., #FF5733)" />
+    <!-- Color HEX Display (without gap) -->
+    <div class="flex-1">
+      <input type="text" v-model="colorValue"
+        class="p-3 h-16 text-lg border-l-0 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 shadow-sm w-full uppercase placeholder:normal-case focus:outline-none focus:ring-none focus:ring-blue-500"
+        placeholder="Enter HEX (e.g., #FF5733)" />
+    </div>
 
-    <!-- Remove Button -->
-    <button @click="onRemove" class="text-red-500 hover:text-red-700 p-3">
-      <i class="fas fa-trash text-xl"></i> <!-- Font Awesome Icon -->
+    <!-- Remove Button (styled to match input, making it part of the block) -->
+    <button @click="onRemove"
+      class="h-16 text-red-200 bg-red-700 border-l-0 border border-gray-300 dark:border-gray-600 rounded-r-lg p-3 transition-all duration-300 hover:brightness-105">
+      <i class="fas fa-trash text-xl"></i>
     </button>
   </div>
 </template>
+
+
 
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue';

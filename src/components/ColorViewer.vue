@@ -190,18 +190,23 @@ const isValidHex = (hex: string): boolean => {
 const handlePaste = (event: ClipboardEvent) => {
   event.preventDefault();
   const pasteData = event.clipboardData?.getData('text/plain') || '';
-  const lines = pasteData.split(/\r?\n/).map((line) => line.trim()).filter((line) => line.length > 0);
 
-  // Process each line, check for mode or handle as HEX if detected
-  for (const element of lines) {
-    const line = element;
+  const lines = pasteData
+    .split(/[\r\n, ]+/)
+    .map(line => line.trim())
+    .filter(line => line.length > 0);
 
-    // Check if it's a valid HEX color or matches current mode
+  for (let line of lines) {
+    if (!line.startsWith('#')) {
+      line = `#${line}`;
+    }
+
     if (isValidHex(line)) {
       fillFirstAvailableOrAdd(line);
     }
   }
 };
+
 
 // Fill first available empty input or add new input
 const fillFirstAvailableOrAdd = (colorValue: string) => {
