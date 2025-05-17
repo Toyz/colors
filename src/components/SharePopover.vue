@@ -4,65 +4,43 @@
       <slot name="trigger" />
     </div>
 
-    <TransitionRoot appear :show="isOpen" as="template">
-      <Dialog as="div" @close="isOpen = false" class="relative z-50">
-        <TransitionChild enter="duration-300 ease-out" enter-from="opacity-0 backdrop-blur-none"
-          enter-to="opacity-100 backdrop-blur-sm" leave="duration-200 ease-in" leave-from="opacity-100 backdrop-blur-sm"
-          leave-to="opacity-0 backdrop-blur-none">
-          <div class="fixed inset-0 bg-black/30 transition-all duration-300" />
-        </TransitionChild>
-
-        <div class="fixed inset-0 overflow-y-auto">
-          <div class="flex min-h-full items-center justify-center p-4">
-            <TransitionChild enter="duration-300 ease-out" enter-from="opacity-0 scale-95"
-              enter-to="opacity-100 scale-100" leave="duration-200 ease-in" leave-from="opacity-100 scale-100"
-              leave-to="opacity-0 scale-95">
-              <DialogPanel class="w-full max-w-md">
-                <div class="overflow-hidden rounded-xl shadow-xl">
-                  <div
-                    class="relative bg-white/30 dark:bg-gray-800/30 backdrop-blur-lg border border-white/20 dark:border-gray-700/20 p-6">
-                    <div class="flex justify-between items-center mb-4">
-                      <DialogTitle class="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                        Share Colors
-                      </DialogTitle>
-                      <button @click="isOpen = false" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 
-                        transition-colors duration-200">
-                        <XMarkIcon class="w-5 h-5" />
-                      </button>
-                    </div>
-                    <div class="relative group">
-                      <div class="relative">
-                        <input ref="urlInput" :value="props.shareUrl" readonly class="w-full px-4 py-3 pr-24 rounded-lg text-sm font-mono bg-white/50 dark:bg-gray-900/50 
-                          border border-white/20 dark:border-gray-700/20 
-                          text-gray-800 dark:text-gray-200 
-                          focus:outline-none focus:ring-2 focus:ring-blue-500/50 
-                          transition-all duration-300" />
-                        <ButtonComponent @click="copyToClipboard" variant="primary" size="sm"
-                          class="absolute right-1.5 top-1.5">
-                          {{ copied ? 'Copied!' : 'Copy' }}
-                        </ButtonComponent>
-                      </div>
-                    </div>
-                    <div class="mt-4 flex items-center gap-3 text-sm text-gray-800 dark:text-gray-200">
-                      <ShareIcon class="w-4 h-4" />
-                      <span>Anyone with the link can view these colors</span>
-                    </div>
-                  </div>
-                </div>
-              </DialogPanel>
-            </TransitionChild>
+    <DialogComponent :show="isOpen" @close="isOpen = false" title-size="large" priority="high" show-close>
+      <template #title>Share Colors</template>
+      <div class="space-y-4">
+        <!-- Share URL Input Group -->
+        <div class="relative">
+          <div
+            class="relative flex overflow-hidden rounded-xl border border-white/20 dark:border-gray-700/20 bg-white/50 dark:bg-gray-900/50">
+            <input ref="urlInput" :value="props.shareUrl" readonly class="flex-1 px-4 py-2.5 text-sm font-mono bg-transparent
+                text-gray-800 dark:text-gray-200 
+                focus:outline-none focus:ring-2 focus:ring-blue-500/50 
+                transition-all duration-300" />
+            <button @click="copyToClipboard" class="flex items-center gap-2 px-4 bg-white/10 dark:bg-gray-800/10 hover:bg-white/20 dark:hover:bg-gray-800/20 
+                text-sm font-medium text-gray-900 dark:text-gray-100
+                border-l border-white/20 dark:border-gray-700/20
+                transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/50">
+              <component :is="copied ? CheckIcon : ClipboardIcon" class="w-4 h-4"
+                :class="{ 'text-emerald-500 dark:text-emerald-400': copied }" />
+              <span>{{ copied ? 'Copied!' : 'Copy' }}</span>
+            </button>
           </div>
         </div>
-      </Dialog>
-    </TransitionRoot>
+
+        <!-- Info Message -->
+        <div class="flex items-center gap-3 text-sm text-gray-800 dark:text-gray-200">
+          <ShareIcon class="w-4 h-4" />
+          <span>Anyone with the link can view these colors</span>
+        </div>
+      </div>
+    </DialogComponent>
   </div>
 </template>
 
 <script setup lang="ts">
-import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue';
-import { ShareIcon, XMarkIcon } from '@heroicons/vue/24/outline';
+import { ClipboardIcon, ShareIcon } from '@heroicons/vue/24/outline';
+import { CheckIcon } from '@heroicons/vue/24/solid';
 import { nextTick, ref, watch } from 'vue';
-import ButtonComponent from './ButtonComponent.vue';
+import DialogComponent from './DialogComponent.vue';
 
 const props = defineProps<{
   shareUrl: string;

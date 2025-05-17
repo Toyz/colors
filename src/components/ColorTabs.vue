@@ -81,125 +81,81 @@
     </TabGroup>
 
     <!-- History Clear Confirmation Dialog -->
-    <TransitionRoot appear :show="isHistoryClearDialogOpen" as="template">
-      <Dialog as="div" @close="isHistoryClearDialogOpen = false" class="relative z-50">
-        <TransitionChild enter="duration-300 ease-out" enter-from="opacity-0" enter-to="opacity-100"
-          leave="duration-200 ease-in" leave-from="opacity-100" leave-to="opacity-0">
-          <div class="fixed inset-0 bg-black/30 backdrop-blur-sm" />
-        </TransitionChild>
-
-        <div class="fixed inset-0 overflow-y-auto">
-          <div class="flex min-h-full items-center justify-center p-4">
-            <TransitionChild enter="duration-300 ease-out" enter-from="opacity-0 scale-95"
-              enter-to="opacity-100 scale-100" leave="duration-200 ease-in" leave-from="opacity-100 scale-100"
-              leave-to="opacity-0 scale-95">
-              <DialogPanel
-                class="w-full max-w-md bg-white/30 dark:bg-gray-800/30 backdrop-blur-lg rounded-2xl p-6 shadow-xl border border-white/20 dark:border-gray-700/20">
-                <DialogTitle class="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
-                  Clear History
-                </DialogTitle>
-                <p class="text-gray-600 dark:text-gray-400 mb-6">
-                  Are you sure you want to clear your history? This action cannot be undone.
-                </p>
-                <div class="flex justify-end space-x-4">
-                  <ButtonComponent @click="confirmClearHistory" variant="danger" :icon="TrashIcon">
-                    Clear
-                  </ButtonComponent>
-                  <ButtonComponent @click="isHistoryClearDialogOpen = false" variant="secondary">
-                    Cancel
-                  </ButtonComponent>
-                </div>
-              </DialogPanel>
-            </TransitionChild>
-          </div>
-        </div>
-      </Dialog>
-    </TransitionRoot>
+    <DialogComponent :show="isHistoryClearDialogOpen" @close="isHistoryClearDialogOpen = false" title-size="large"
+      priority="high">
+      <template #title>Clear History</template>
+      <p class="text-gray-600 dark:text-gray-400">
+        Are you sure you want to clear your history? This action cannot be undone.
+      </p>
+      <template #actions>
+        <ButtonComponent @click="confirmClearHistory" variant="danger" :icon="TrashIcon">
+          Clear
+        </ButtonComponent>
+        <ButtonComponent @click="isHistoryClearDialogOpen = false" variant="secondary">
+          Cancel
+        </ButtonComponent>
+      </template>
+    </DialogComponent>
 
     <!-- Favorites Import Confirmation Dialog -->
-    <TransitionRoot appear :show="isImportDialogOpen" as="template">
-      <Dialog as="div" @close="isImportDialogOpen = false" class="relative z-50">
-        <TransitionChild enter="duration-300 ease-out" enter-from="opacity-0" enter-to="opacity-100"
-          leave="duration-200 ease-in" leave-from="opacity-100" leave-to="opacity-0">
-          <div class="fixed inset-0 bg-black/30 backdrop-blur-sm" />
-        </TransitionChild>
-
-        <div class="fixed inset-0 overflow-y-auto">
-          <div class="flex min-h-full items-center justify-center p-4">
-            <TransitionChild enter="duration-300 ease-out" enter-from="opacity-0 scale-95"
-              enter-to="opacity-100 scale-100" leave="duration-200 ease-in" leave-from="opacity-100 scale-100"
-              leave-to="opacity-0 scale-95">
-              <DialogPanel
-                class="w-full max-w-md bg-white/30 dark:bg-gray-800/30 backdrop-blur-lg rounded-2xl p-6 shadow-xl border border-white/20 dark:border-gray-700/20">
-                <DialogTitle class="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
-                  Import Favorites
-                </DialogTitle>
-                <p class="text-gray-600 dark:text-gray-400 mb-6">
-                  This will replace all your existing favorites. Are you sure you want to continue?
-                </p>
-                <div class="flex justify-end space-x-4">
-                  <ButtonComponent @click="confirmImport" variant="primary" :icon="ArrowUpTrayIcon">
-                    Import
-                  </ButtonComponent>
-                  <ButtonComponent @click="isImportDialogOpen = false" variant="secondary">
-                    Cancel
-                  </ButtonComponent>
-                </div>
-              </DialogPanel>
-            </TransitionChild>
-          </div>
-        </div>
-      </Dialog>
-    </TransitionRoot>
+    <DialogComponent :show="isImportDialogOpen" @close="isImportDialogOpen = false" title-size="large" priority="high">
+      <template #title>Import Favorites</template>
+      <p class="text-gray-600 dark:text-gray-400">
+        This will replace all your existing favorites. Are you sure you want to continue?
+      </p>
+      <template #actions>
+        <ButtonComponent @click="confirmImport" variant="primary" :icon="ArrowUpTrayIcon">
+          Import
+        </ButtonComponent>
+        <ButtonComponent @click="isImportDialogOpen = false" variant="secondary">
+          Cancel
+        </ButtonComponent>
+      </template>
+    </DialogComponent>
 
     <!-- Error Dialog -->
-    <TransitionRoot appear :show="!!errorMessage" as="template">
-      <Dialog as="div" @close="errorMessage = ''" class="relative z-50">
-        <TransitionChild enter="duration-300 ease-out" enter-from="opacity-0" enter-to="opacity-100"
-          leave="duration-200 ease-in" leave-from="opacity-100" leave-to="opacity-0">
-          <div class="fixed inset-0 bg-black/30 backdrop-blur-sm" />
-        </TransitionChild>
+    <DialogComponent :show="!!errorMessage" @close="errorMessage = ''" title-size="large" priority="high" show-close>
+      <template #title>Error</template>
+      <p class="text-gray-600 dark:text-gray-400">
+        {{ errorMessage }}
+      </p>
+      <template #actions>
+        <ButtonComponent @click="errorMessage = ''" variant="secondary">
+          Close
+        </ButtonComponent>
+      </template>
+    </DialogComponent>
 
-        <div class="fixed inset-0 overflow-y-auto">
-          <div class="flex min-h-full items-center justify-center p-4">
-            <TransitionChild enter="duration-300 ease-out" enter-from="opacity-0 scale-95"
-              enter-to="opacity-100 scale-100" leave="duration-200 ease-in" leave-from="opacity-100 scale-100"
-              leave-to="opacity-0 scale-95">
-              <DialogPanel
-                class="w-full max-w-md bg-white/30 dark:bg-gray-800/30 backdrop-blur-lg rounded-2xl p-6 shadow-xl border border-white/20 dark:border-gray-700/20">
-                <div class="flex justify-between items-center mb-4">
-                  <DialogTitle class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
-                    Error
-                  </DialogTitle>
-                  <button @click="errorMessage = ''"
-                    class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
-                    <XMarkIcon class="w-5 h-5" />
-                  </button>
-                </div>
-                <p class="text-gray-600 dark:text-gray-400 mb-6">
-                  {{ errorMessage }}
-                </p>
-                <div class="flex justify-end">
-                  <ButtonComponent @click="errorMessage = ''" variant="secondary">
-                    Close
-                  </ButtonComponent>
-                </div>
-              </DialogPanel>
-            </TransitionChild>
-          </div>
-        </div>
-      </Dialog>
-    </TransitionRoot>
+    <!-- Reset Confirmation Dialog -->
+    <DialogComponent :show="isOpen" @close="closeModal" centered>
+      <template #title>Reset Confirmation</template>
+      <p class="text-sm text-gray-700 dark:text-gray-300">
+        Are you sure you want to reset all colors? This action cannot be undone.
+      </p>
+      <template #actions>
+        <button type="button"
+          class="inline-flex justify-center rounded-lg bg-white/10 dark:bg-gray-800/10 px-4 py-2 text-sm font-medium text-gray-900 dark:text-gray-100 hover:bg-white/20 dark:hover:bg-gray-800/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/75 transition-colors duration-200"
+          @click="closeModal">
+          Cancel
+        </button>
+        <button type="button"
+          class="inline-flex justify-center rounded-lg bg-red-600/80 px-4 py-2 text-sm font-medium text-white hover:bg-red-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500/75 transition-colors duration-200"
+          @click="confirmReset">
+          Reset
+        </button>
+      </template>
+    </DialogComponent>
   </div>
 </template>
 
 <script setup lang="ts">
-import { Dialog, DialogPanel, DialogTitle, Tab, TabGroup, TabList, TabPanel, TabPanels, TransitionChild, TransitionRoot } from '@headlessui/vue';
-import { ArrowDownTrayIcon, ArrowUpTrayIcon, ClockIcon, StarIcon, SwatchIcon, TrashIcon, XMarkIcon } from '@heroicons/vue/24/outline';
+import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/vue';
+import { ArrowDownTrayIcon, ArrowUpTrayIcon, ClockIcon, StarIcon, SwatchIcon, TrashIcon } from '@heroicons/vue/24/outline';
 import { computed, onMounted, ref, watch } from 'vue';
 import { useColorStore } from '../stores/colorStore';
 import ButtonComponent from './ButtonComponent.vue';
 import ColorPaletteItem from './ColorPaletteItem.vue';
+import DialogComponent from './DialogComponent.vue';
 
 interface PaletteItem {
   colors: string[];
@@ -247,6 +203,7 @@ const tabs = [
 // Dialog state
 const isHistoryClearDialogOpen = ref(false);
 const isImportDialogOpen = ref(false);
+const isOpen = ref(false);  // Added for reset dialog
 const errorMessage = ref('');
 const fileInput = ref<HTMLInputElement>();
 const importData = ref<PaletteItem[]>();
@@ -342,5 +299,16 @@ const confirmImport = () => {
     isImportDialogOpen.value = false;
     importData.value = undefined;
   }
+};
+
+// Reset dialog methods
+const closeModal = () => {
+  isOpen.value = false;
+};
+
+const confirmReset = () => {
+  // Emit to parent to handle the reset action
+  emit('load', []);
+  closeModal();
 };
 </script>

@@ -69,40 +69,20 @@
     </main>
 
     <!-- Reset Confirmation Modal -->
-    <TransitionRoot appear :show="isResetModelOpen" as="template">
-      <Dialog as="div" @close="isResetModelOpen = false" class="relative z-50">
-        <TransitionChild enter="duration-300 ease-out" enter-from="opacity-0" enter-to="opacity-100"
-          leave="duration-200 ease-in" leave-from="opacity-100" leave-to="opacity-0">
-          <div class="fixed inset-0 bg-black/30 backdrop-blur-sm" />
-        </TransitionChild>
-
-        <div class="fixed inset-0 overflow-y-auto">
-          <div class="flex min-h-full items-center justify-center p-4">
-            <TransitionChild enter="duration-300 ease-out" enter-from="opacity-0 scale-95"
-              enter-to="opacity-100 scale-100" leave="duration-200 ease-in" leave-from="opacity-100 scale-100"
-              leave-to="opacity-0 scale-95">
-              <DialogPanel class="w-full max-w-md bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-xl">
-                <DialogTitle class="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
-                  Reset Colors
-                </DialogTitle>
-
-                <p class="text-gray-600 dark:text-gray-400 mb-6">
-                  Are you sure you want to reset all colors? This action cannot be undone.
-                </p>
-                <div class="flex justify-end space-x-4">
-                  <ButtonComponent @click="resetColors" variant="danger">
-                    Reset
-                  </ButtonComponent>
-                  <ButtonComponent @click="isResetModelOpen = false" variant="secondary">
-                    Cancel
-                  </ButtonComponent>
-                </div>
-              </DialogPanel>
-            </TransitionChild>
-          </div>
-        </div>
-      </Dialog>
-    </TransitionRoot>
+    <DialogComponent :show="isResetModelOpen" @close="isResetModelOpen = false" title-size="large" centered>
+      <template #title>Reset Colors</template>
+      <p class="text-gray-600 dark:text-gray-400">
+        Are you sure you want to reset all colors? This action cannot be undone.
+      </p>
+      <template #actions>
+        <ButtonComponent @click="resetColors" variant="danger">
+          Reset
+        </ButtonComponent>
+        <ButtonComponent @click="isResetModelOpen = false" variant="secondary">
+          Cancel
+        </ButtonComponent>
+      </template>
+    </DialogComponent>
 
     <!-- Footer with enhanced design -->
     <footer class="mt-12 text-center py-6">
@@ -130,13 +110,13 @@
 </template>
 
 <script setup lang="ts">
-import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue';
 import { ArrowPathIcon, MinusIcon, PlusIcon, ShareIcon } from '@heroicons/vue/24/outline';
 import { computed, inject, onBeforeUnmount, onMounted, provide, ref } from 'vue';
 import { useColorStore } from '../stores/colorStore';
 import ButtonComponent from './ButtonComponent.vue';
 import ColorInput from './ColorInput.vue';
 import ColorTabs from './ColorTabs.vue';
+import DialogComponent from './DialogComponent.vue';
 import SharePopover from './SharePopover.vue';
 
 // State management
