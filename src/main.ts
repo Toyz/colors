@@ -1,8 +1,10 @@
-import "@fortawesome/fontawesome-free/css/all.css";
+import { createPinia } from "pinia";
 import { createApp } from "vue";
-import Vue3ColorPicker from "vue3-colorpicker";
-import "vue3-colorpicker/style.css";
 import App from "./App.vue";
 import "./style.css";
 
-createApp(App).use(Vue3ColorPicker).mount("#app");
+const app = createApp(App);
+const pinia = createPinia();
+
+app.use(pinia);
+app.mount("#app");

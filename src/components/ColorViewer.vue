@@ -1,120 +1,128 @@
 <template>
-  <div class="min-h-screen flex flex-col items-center justify-center bg-white dark:bg-gray-800 p-6">
-    <!-- Title -->
-    <h1 class="text-4xl font-bold mb-6 text-gray-200">Batch Color Preview</h1>
+  <div
+    class="min-h-screen flex flex-col bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-950 dark:via-gray-900 dark:to-gray-800 p-6 transition-colors duration-500">
+    <!-- Header section with gradient text -->
+    <header class="text-center mb-12 pt-8">
+      <h1
+        class="text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 mb-4">
+        Batch Color Preview
+      </h1>
+      <p class="text-gray-600 dark:text-gray-400 text-lg max-w-xl mx-auto">
+        Create, manage, and share your color palettes with ease
+      </p>
+    </header>
 
-    <!-- Action Buttons -->
-    <div class="flex justify-between items-center mb-2 w-full max-w-lg">
-      <!-- Left - Add and Remove Icons -->
-      <div class="flex space-x-4 relative items-center align-middle">
-        <div class="relative group">
-          <button @click="addNewColorInput" class="bg-transparent">
-            <i class="fas fa-plus text-blue-600 text-2xl cursor-pointer"></i>
-          </button>
-          <span
-            class="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity z-10 whitespace-nowrap pointer-events-none">
-            Add Color
-          </span>
+    <!-- Main content -->
+    <main class="flex-1 flex flex-col items-center w-full">
+      <ColorTabs :current-colors="colors" :selectedIndex="activeTab" @change="activeTab = $event" @load="loadPalette">
+        <template #palette>
+          <div class="w-full max-w-2xl mx-auto">
+            <!-- Action Bar with glassmorphism -->
+            <div
+              class="w-full mb-6 p-4 bg-white/30 dark:bg-gray-800/30 backdrop-blur-lg rounded-2xl shadow-lg border border-white/20 dark:border-gray-700/20">
+              <div class="flex justify-between items-center">
+                <!-- Left Actions -->
+                <div class="flex space-x-4">
+                  <ButtonComponent @click="addNewColorInput" variant="primary" :icon="PlusIcon">
+                    Add Color
+                  </ButtonComponent>
+                  <ButtonComponent @click="removeLastColorInput" variant="danger" :icon="MinusIcon"
+                    :disabled="colors.length === 0">
+                    Remove
+                  </ButtonComponent>
+                </div>
+
+                <!-- Right Actions -->
+                <div class="flex space-x-4">
+                  <ButtonComponent @click="isResetModelOpen = true" variant="warning" :icon="ArrowPathIcon"
+                    :disabled="colors.length === 0">
+                    Reset
+                  </ButtonComponent>
+                  <SharePopover :share-url="shareableUrl" @shared="handleShared">
+                    <template #trigger>
+                      <ButtonComponent variant="success" :icon="ShareIcon" :disabled="colors.length === 0">
+                        Share
+                      </ButtonComponent>
+                    </template>
+                  </SharePopover>
+                </div>
+              </div>
+            </div>
+
+            <!-- Color Inputs with staggered animation -->
+            <div class="relative w-full">
+              <TransitionGroup name="color-list" tag="div" class="relative space-y-4">
+                <ColorInput v-for="(color, index) in colors" :key="index" :color="color"
+                  @update:color="updateColor(index, $event)" @remove="removeColor(index)" />
+              </TransitionGroup>
+
+              <!-- Empty State -->
+              <div v-if="colors.length === 0" class="text-center py-12">
+                <p class="text-gray-500 dark:text-gray-400 text-lg">
+                  Add some colors to get started!
+                </p>
+              </div>
+            </div>
+          </div>
+        </template>
+      </ColorTabs>
+    </main>
+
+    <!-- Reset Confirmation Modal -->
+    <TransitionRoot appear :show="isResetModelOpen" as="template">
+      <Dialog as="div" @close="isResetModelOpen = false" class="relative z-50">
+        <TransitionChild enter="duration-300 ease-out" enter-from="opacity-0" enter-to="opacity-100"
+          leave="duration-200 ease-in" leave-from="opacity-100" leave-to="opacity-0">
+          <div class="fixed inset-0 bg-black/30 backdrop-blur-sm" />
+        </TransitionChild>
+
+        <div class="fixed inset-0 overflow-y-auto">
+          <div class="flex min-h-full items-center justify-center p-4">
+            <TransitionChild enter="duration-300 ease-out" enter-from="opacity-0 scale-95"
+              enter-to="opacity-100 scale-100" leave="duration-200 ease-in" leave-from="opacity-100 scale-100"
+              leave-to="opacity-0 scale-95">
+              <DialogPanel class="w-full max-w-md bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-xl">
+                <DialogTitle class="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
+                  Reset Colors
+                </DialogTitle>
+
+                <p class="text-gray-600 dark:text-gray-400 mb-6">
+                  Are you sure you want to reset all colors? This action cannot be undone.
+                </p>
+                <div class="flex justify-end space-x-4">
+                  <ButtonComponent @click="resetColors" variant="danger">
+                    Reset
+                  </ButtonComponent>
+                  <ButtonComponent @click="isResetModelOpen = false" variant="secondary">
+                    Cancel
+                  </ButtonComponent>
+                </div>
+              </DialogPanel>
+            </TransitionChild>
+          </div>
         </div>
+      </Dialog>
+    </TransitionRoot>
 
-        <div class="relative group">
-          <button v-if="colors.length > 0" @click="removeLastColorInput" class="bg-transparent">
-            <i class="fas fa-minus text-red-600 text-2xl cursor-pointer"></i>
-          </button>
-          <span
-            class="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity z-10 whitespace-nowrap pointer-events-none">
-            Remove Color
-          </span>
-        </div>
-      </div>
-
-      <div class="flex space-x-4 relative items-center align-middle">
-        <div class="relative group">
-          <button v-if="colors.length > 0" @click="isResetModelOpen = true" class="bg-transparent">
-            <i class="fas fa-arrows-rotate text-red-600 text-2xl cursor-pointer"></i>
-          </button>
-          <span
-            class="absolute right-full mr-2 px-2 py-1 bg-gray-900 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity z-10 whitespace-nowrap pointer-events-none">
-            Reset Colors
-          </span>
-        </div>
-
-        <!-- Right - Share Icon -->
-        <div class="relative group">
-          <button @click="openShareModal" class="bg-transparent">
-            <i class="fas fa-share-alt text-green-600 text-2xl cursor-pointer"></i>
-          </button>
-          <span
-            class="absolute right-full mr-2 px-2 py-1 bg-gray-900 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity z-10 whitespace-nowrap pointer-events-none">
-            Share Colors
-          </span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Color Inputs -->
-    <div class="space-y-2 w-full max-w-lg">
-      <ColorInput v-for="(color, index) in colors" :key="index" :color="color"
-        @update:color="updateColor(index, $event)" @remove="removeColor(index)" />
-    </div>
-
-    <!-- Share Modal -->
-    <div v-if="isShareModalOpen" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-      <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-md">
-        <h2 class="text-xl font-bold mb-4 text-gray-800 dark:text-gray-200">Shareable URL</h2>
-
-        <!-- Shareable URL Input Field -->
-        <div class="relative mb-4">
-          <input :value="shareableUrl" readonly
-            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-800 dark:text-gray-200 bg-gray-100 dark:bg-gray-700 shadow-sm focus:outline-none cursor-pointer" />
-        </div>
-
-        <div class="mt-4 flex justify-end space-x-2">
-          <button @click="copyShareableUrl"
-            class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow focus:outline-none">
-            Copy
-          </button>
-          <button @click="isShareModalOpen = false"
-            class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg shadow focus:outline-none">
-            Close
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Share Modal -->
-    <div v-if="isResetModelOpen" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-      <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-md">
-        <h2 class="text-xl font-bold mb-4 text-gray-800 dark:text-gray-200">Reset Colors</h2>
-
-        <!-- Shareable URL Input Field -->
-        <div class="relative mb-4 text-gray-800 dark:text-gray-200">
-          Are you sure you want to reset the colors?
-        </div>
-
-        <div class="mt-4 flex justify-end space-x-2">
-          <button @click="resetColors"
-            class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow focus:outline-none">
-            Reset
-          </button>
-          <button @click="isResetModelOpen = false"
-            class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg shadow focus:outline-none">
-            Close
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Footer -->
-    <footer class="mt-12 text-center">
-      <p class="text-gray-500 dark:text-gray-400 text-sm mb-2">Created by <span
-          class="font-semibold">helba_the_ai</span></p>
-      <div class="flex justify-center space-x-4">
-        <a href="https://github.com/toyz/colors" target="_blank" class="text-blue-500 hover:text-blue-700">
-          <i class="fab fa-github fa-2x"></i>
+    <!-- Footer with enhanced design -->
+    <footer class="mt-12 text-center py-6">
+      <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">
+        Created with ❤️ by <a href="https://x.com/Helba_The_AI" target="_blank"
+          class="font-semibold hover:text-blue-600 transition-colors">helba_the_ai</a>
+      </p>
+      <div class="flex justify-center space-x-6"> <a href="https://github.com/toyz/colors" target="_blank"
+          class="text-gray-600 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 transition-colors">
+          <svg viewBox="0 0 24 24" class="w-8 h-8 fill-current">
+            <path
+              d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
+          </svg>
         </a>
-        <a href="https://x.com/Helba_The_AI" target="_blank" class="text-blue-500 hover:text-blue-700">
-          <i class="fab fa-x-twitter fa-2x"></i>
+        <a href="https://x.com/Helba_The_AI" target="_blank"
+          class="text-gray-600 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 transition-colors">
+          <svg viewBox="0 0 24 24" class="w-8 h-8 fill-current">
+            <path
+              d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+          </svg>
         </a>
       </div>
     </footer>
@@ -122,156 +130,120 @@
 </template>
 
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, ref } from 'vue';
+import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue';
+import { ArrowPathIcon, MinusIcon, PlusIcon, ShareIcon } from '@heroicons/vue/24/outline';
+import { computed, inject, onBeforeUnmount, onMounted, provide, ref } from 'vue';
+import { useColorStore } from '../stores/colorStore';
+import ButtonComponent from './ButtonComponent.vue';
 import ColorInput from './ColorInput.vue';
+import ColorTabs from './ColorTabs.vue';
+import SharePopover from './SharePopover.vue';
 
-// Color list, starts with one empty input
-const colors = ref<string[]>(['']);
-const isShareModalOpen = ref(false); // Modal visibility
-const isResetModelOpen = ref(false); // Modal visibility
-const shareableUrl = ref('');
+// State management
+const colors = ref<string[]>([]);
+const activeTab = ref(0);
+const isResetModelOpen = ref(false);
+const store = useColorStore();
+const shareableUrl = computed(() => store.shareableUrl);
 
-// Function to add a new color input
+// Get app reference and provide appRef to children
+const appRef = inject<{ showPicker: Function }>('appRef');
+provide('appRef', appRef);
+
+// Color management functions
 const addNewColorInput = () => {
   colors.value.push('');
 };
 
-// Function to remove the last color input
+const handleShared = () => {
+  store.updateColors(colors.value, true); // Mark colors as shared when share dialog opens
+};
+
 const removeLastColorInput = () => {
   if (colors.value.length > 0) {
     colors.value.pop();
   }
-
-  if (colors.value.length === 0) {
-    colors.value.push('');
-  }
 };
 
-// Function to update the color input when the value is changed
 const updateColor = (index: number, newColor: string) => {
   colors.value[index] = newColor;
+  store.updateColors(colors.value);
 };
 
-// Function to remove a color input by index
 const removeColor = (index: number) => {
   colors.value.splice(index, 1);
-
-  if (colors.value.length === 0) {
-    colors.value.push('');
-  }
+  store.updateColors(colors.value);
 };
 
-// Open Share Modal
-const openShareModal = () => {
-  const uniqueColors = Array.from(new Set(colors.value.filter(isValidHex)));
-  if (uniqueColors.length === 0) {
-    alert('No valid colors to share.');
-    return;
-  }
-  const colorString = uniqueColors.join(',');
-  const base64Colors = btoa(colorString);
-  shareableUrl.value = `${window.location.origin}${window.location.pathname}#${base64Colors}`;
-  isShareModalOpen.value = true;
-};
+// Color input functions for paste handling
 
-// Copy shareable URL to clipboard
-const copyShareableUrl = () => {
-  navigator.clipboard.writeText(shareableUrl.value).then(() => {
-    alert('URL copied to clipboard!');
-  });
-};
-
-// Helper function to check if a hex color is valid
-const isValidHex = (hex: string): boolean => {
-  return /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(hex);
-};
-
-// Handle paste event, reading the lines and filling inputs
+// Paste handling
 const handlePaste = (event: ClipboardEvent) => {
   event.preventDefault();
   const pasteData = event.clipboardData?.getData('text/plain') || '';
-
   const lines = pasteData
     .split(/[\r\n, ]+/)
     .map(line => line.trim())
     .filter(line => line.length > 0);
-
   for (let line of lines) {
     if (!line.startsWith('#')) {
       line = `#${line}`;
     }
-
-    if (isValidHex(line)) {
-      fillFirstAvailableOrAdd(line);
-    }
+    fillFirstAvailableOrAdd(line);
   }
+  store.updateColors(colors.value);
 };
 
-
-// Fill first available empty input or add new input
 const fillFirstAvailableOrAdd = (colorValue: string) => {
-  let availableSlotIndex = colors.value.findIndex(color => color === '');
-
+  const availableSlotIndex = colors.value.findIndex(color => color === '');
   if (availableSlotIndex !== -1) {
-    colors.value[availableSlotIndex] = colorValue;  // Fill empty slot
+    colors.value[availableSlotIndex] = colorValue;
   } else {
-    colors.value.push(colorValue);  // Add new input if no empty slots
+    colors.value.push(colorValue);
   }
 };
 
+// Keyboard shortcuts
 const handleKeyDown = (event: KeyboardEvent) => {
-  console.log(event.key);
   if (event.altKey && (event.key === '+' || event.key === '=')) {
     event.preventDefault();
     addNewColorInput();
   } else if (event.altKey && event.key === '-') {
     event.preventDefault();
     removeLastColorInput();
-  } // else if escape key, close modal
-  else if (event.key === 'Escape') {
-    isShareModalOpen.value = false;
+  } else if (event.key === 'Escape') {
     isResetModelOpen.value = false;
-  } else if (event.altKey && event.key === 's') {
-    openShareModal();
   } else if (event.altKey && event.key === 'r') {
     isResetModelOpen.value = true;
   }
 };
 
+// Reset functionality
 const resetColors = () => {
-  resetColorView();
+  colors.value = [];
+  store.resetColors();
   isResetModelOpen.value = false;
 };
 
-const resetColorView = () => {
-  colors.value = [''];
-
-  // if we have a hash, remove it
-  if (window.location.hash) {
-    window.history.pushState('', document.title, window.location.pathname + window.location.search);
-  }
-
-  shareableUrl.value = '';
+const loadPalette = (newColors: string[]) => {
+  colors.value = [...newColors];
+  store.updateColors(colors.value, true); // Mark as shared since it's loaded from history/favorites
 };
 
-// Add event listeners on mount and remove them before unmount
+// Lifecycle hooks
 onMounted(() => {
-  const hash = window.location.hash.slice(1); // Remove the `#`
+  const hash = window.location.hash.slice(1);
   if (hash) {
     try {
-      const decodedColors = atob(hash).split(','); // Decode base64 and split by comma
-      if (decodedColors.every(isValidHex)) {
-        colors.value = decodedColors;
-      } else {
-        console.warn('Invalid colors in the hash');
-      }
+      const decodedColors = atob(hash).split(',');
+      colors.value = decodedColors;
+      store.updateColors(decodedColors, true); // Mark as shared since it's loaded from URL
     } catch (e) {
       console.error('Invalid base64 string');
     }
   }
 
   window.addEventListener('keydown', handleKeyDown);
-  // on paste, handle the event
   window.addEventListener('paste', handlePaste);
 });
 
@@ -282,5 +254,23 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
-/* No custom CSS, all handled with Tailwind */
+.color-list-move,
+.color-list-enter-active,
+.color-list-leave-active {
+  transition: all 0.3s ease;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.color-list-enter-from,
+.color-list-leave-to {
+  opacity: 0;
+  transform: translateX(30px);
+}
+
+.color-list-leave-active {
+  position: absolute;
+  width: 100%;
+  visibility: hidden;
+}
 </style>
